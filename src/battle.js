@@ -30,9 +30,11 @@ export function spawnEncounter(state) {
 
   banner.className = '';
   const surviving = state.tournamentPlayers.filter(p => p.id !== 'player' && p.isAlive);
-  const rival = surviving.length > 0
-    ? surviving[Math.floor(Math.random() * surviving.length)]
-    : { name: 'Shadow Champion', hp: 50, focus: 'Mixed' };
+  if (surviving.length === 0) {
+    triggerVictoryScreen(state);
+    return;
+  }
+  const rival = surviving[Math.floor(Math.random() * surviving.length)];
 
   banner.innerHTML = `ROUND ${state.stage}: VS ${rival.name} (${rival.hp} HP)`;
 
@@ -95,10 +97,17 @@ export function spawnEncounter(state) {
   }
 }
 
-export function simulateBackgroundRivals(tournamentPlayers) {
-  tournamentPlayers.forEach(p => {
+export function simulateBackgroundRivals(tournamentPlayers, currentStage = 1) {
+  // Scale chip damage based on stage so rivals survive into late game (Rounds 8-12+)
+  // Stage 1-3: 3-7 dmg, Stage 4-7: 6-12 dmg, Stage 8+: 10-18 dmg
+  const baseMin = currentStage >= 8 ? 10 : (currentStage >= 4 ? 6 : 3);
+  const baseVariance = currentStage >= 8 ? 8 : (currentStage >= 4 ? 6 : 4);
+
+  tournamentPlayers.forEach((p, idx) => {
     if (p.id !== 'player' && p.isAlive) {
-      let chip = 10 + Math.floor(Math.random() * 12);
+      // Top rivals take slightly less damage so 1-2 champions survive for endgame showdowns
+      const defenseBonus = idx <= 3 ? Math.floor(Math.random() * 3) : 0;
+      let chip = Math.max(2, baseMin + Math.floor(Math.random() * baseVariance) - defenseBonus);
       p.hp = Math.max(0, p.hp - chip);
       if (p.hp <= 0) p.isAlive = false;
     }
@@ -196,17 +205,13 @@ export async function startBattle(state, callbacks) {
       }
 
       state.stage++;
-      simulateBackgroundRivals(state.tournamentPlayers);
+      simulateBackgroundRivals(state.tournamentPlayers, state.stage);
       callbacks.updateUI();
 
       const remainingRivals = state.tournamentPlayers.filter(p => p.id !== 'player' && p.isAlive);
       if (remainingRivals.length === 0) {
         await new Promise(r => setTimeout(r, 600));
-        document.getElementById('vic-level').innerText = state.playerLevel;
-        document.getElementById('vic-stage').innerText = state.stage - 1;
-        document.getElementById('vic-gold').innerText = state.gold;
-        openModal('victory-modal');
-        state.isBattling = false;
+        triggerVictoryScreen(state);
         return;
       }
 
@@ -226,16 +231,24 @@ export async function startBattle(state, callbacks) {
       state.gold += 5 + interestGold;
       showToast(`💥 Round Lost! -${dmgTaken} HP (+${5 + interestGold}g)`);
 
-      simulateBackgroundRivals(state.tournamentPlayers);
+      simulateBackgroundRivals(state.tournamentPlayers, state.stage);
       callbacks.updateUI();
 
       await new Promise(r => setTimeout(r, 1000));
+
+      const remainingRivals = state.tournamentPlayers.filter(p => p.id !== 'player' && p.isAlive);
+
+      // If all rivals have fallen, the player wins 1st Place Champion!
+      if (remainingRivals.length === 0) {
+        triggerVictoryScreen(state);
+        return;
+      }
 
       if (state.playerHp <= 0) {
         document.getElementById('go-stage').innerText = state.stage;
         document.getElementById('go-level').innerText = state.playerLevel;
         document.getElementById('go-mutations').innerText = `${Object.values(state.discoveredFusions).filter(Boolean).length}/3`;
-        document.getElementById('go-rivals').innerText = state.tournamentPlayers.filter(p => p.id !== 'player' && p.isAlive).length;
+        document.getElementById('go-rivals').innerText = remainingRivals.length;
         openModal('gameover-modal');
         state.isBattling = false;
         return;
@@ -673,4 +686,18 @@ function restoreBoardAndEndRound(state, savedPlayerArmy, callbacks) {
   callbacks.generateShop();
   callbacks.renderAll();
   callbacks.updateUI();
+}
+
+export function triggerVictoryScreen(state) {
+  try { AudioEngine.victory(); } catch (e) {}
+  const vicLvl = document.getElementById('vic-level');
+  const vicStage = document.getElementById('vic-stage');
+  const vicGold = document.getElementById('vic-gold');
+
+  if (vicLvl) vicLvl.innerText = state.playerLevel;
+  if (vicStage) vicStage.innerText = Math.max(1, state.stage);
+  if (vicGold) vicGold.innerText = state.gold;
+
+  openModal('victory-modal');
+  state.isBattling = false;
 }
