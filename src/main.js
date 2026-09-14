@@ -1,4 +1,4 @@
-﻿import { PLAYER_LEVELS, SHOP_ODDS, AXIE_ROSTER, SECRET_MUTATION_TABLE, BOSS_ARTIFACTS } from './config.js';
+import { PLAYER_LEVELS, SHOP_ODDS, AXIE_ROSTER, SECRET_MUTATION_TABLE, BOSS_ARTIFACTS } from './config.js';
 import { AudioEngine, triggerScreenShake } from './audio.js';
 import {
   showToast,
@@ -276,6 +276,8 @@ export function handleBenchClick(idx) {
 
   if (state.selectedSource) {
     if (state.selectedSource.type === 'bench' && state.selectedSource.index === idx) {
+      // Second tap / double click on selected unit opens inspection modal!
+      if (state.bench[idx]) openInspectModal(state.bench[idx]);
       state.selectedSource = null;
     } else {
       moveOrMerge('bench', idx);
@@ -304,6 +306,8 @@ export function handleBoardClick(r, c) {
 
   if (state.selectedSource) {
     if (state.selectedSource.type === 'board' && state.selectedSource.index.r === r && state.selectedSource.index.c === c) {
+      // Second tap / double click on selected unit opens inspection modal!
+      if (state.board[r][c]) openInspectModal(state.board[r][c]);
       state.selectedSource = null;
     } else {
       moveOrMerge('board', { r, c });
