@@ -340,6 +340,7 @@ export function executeTick(state, tick) {
   const { originCounts: pOrigins } = getUniqueSynergyCounts(state.board, 'player');
   const { originCounts: eOrigins } = getUniqueSynergyCounts(state.board, 'enemy');
 
+  // Aqua regeneration
   if ((pOrigins['Aqua'] || 0) >= 2) {
     for (let r = 2; r <= 3; r++) {
       for (let c = 0; c < 3; c++) {
@@ -357,6 +358,7 @@ export function executeTick(state, tick) {
     }
   }
 
+  // 1. Frontline column clashes (Melee / Primary clash)
   for (let col = 0; col < 3; col++) {
     let p = null, e = null;
     for (let r = 2; r <= 3; r++) if (state.board[r][col]?.team === 'player') { p = { r, c: col }; break; }
@@ -367,16 +369,46 @@ export function executeTick(state, tick) {
 
     if (p && e) resolveClash(state, p, e, tick);
   }
+
+  // 2. Backline Ranged Support: Any Row 3 player unit and Row 0 enemy unit whose column had a frontline unit in front
+  // now also fires a ranged support shot so backline carries are never idle!
+  for (let c = 0; c < 3; c++) {
+    const pBack = state.board[3][c];
+    if (pBack && state.board[2][c]) { // Backline unit with frontline standing ahead
+      const targetEnemy = findTarget(state.board, 'enemy', c);
+      if (targetEnemy && state.board[targetEnemy.r][targetEnemy.c]) {
+        resolveRangedAttack(state, { r: 3, c }, targetEnemy, tick);
+      }
+    }
+
+    const eBack = state.board[0][c];
+    if (eBack && state.board[1][c]) { // Enemy backline with front standing ahead
+      const targetPlayer = findTarget(state.board, 'player', c);
+      if (targetPlayer && state.board[targetPlayer.r][targetPlayer.c]) {
+        resolveRangedAttack(state, { r: 0, c }, targetPlayer, tick);
+      }
+    }
+  }
+
   renderBoard(state);
 }
 
 function findTarget(board, team, fromCol) {
-  const searchOrder = fromCol === 1 ? [0, 2] : (fromCol === 0 ? [1, 2] : [1, 0]);
-  for (let c of searchOrder) {
-    if (team === 'enemy') {
-      for (let r = 1; r >= 0; r--) if (board[r][c]?.team === 'enemy') return { r, c };
-    } else {
-      for (let r = 2; r <= 3; r++) if (board[r][c]?.team === 'player') return { r, c };
+  // First search opposing frontline in same column, then adjacent columns, then backline
+  const cols = [fromCol, (fromCol + 1) % 3, (fromCol + 2) % 3];
+  if (team === 'enemy') {
+    // Look at enemy front row (r = 1), then back row (r = 0)
+    for (let r of [1, 0]) {
+      for (let c of cols) {
+        if (board[r][c]?.team === 'enemy' && board[r][c].currentHp > 0) return { r, c };
+      }
+    }
+  } else {
+    // Look at player front row (r = 2), then back row (r = 3)
+    for (let r of [2, 3]) {
+      for (let c of cols) {
+        if (board[r][c]?.team === 'player' && board[r][c].currentHp > 0) return { r, c };
+      }
     }
   }
   return null;
@@ -418,6 +450,58 @@ function applyDamageWithShield(unit, dmg) {
   }
 }
 
+export function showAbilityBanner(r, c, abilityName, icon = '⚡') {
+  const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+  if (!cell) return;
+  const banner = document.createElement('div');
+  banner.className = 'floating-ability';
+  banner.innerHTML = `${icon} ${abilityName}!`;
+  cell.appendChild(banner);
+  setTimeout(() => banner.remove(), 1100);
+}
+
+// Ranged support attack for backline carries
+function resolveRangedAttack(state, attackerCoord, targetCoord, tick) {
+  const atkU = state.board[attackerCoord.r][attackerCoord.c];
+  const tgtU = state.board[targetCoord.r][targetCoord.c];
+  if (!atkU || !tgtU || atkU.currentHp <= 0 || tgtU.currentHp <= 0) return;
+
+  const aCell = document.querySelector(`.cell[data-r="${attackerCoord.r}"][data-c="${attackerCoord.c}"]`);
+  const aEl = document.getElementById(`unit-${attackerCoord.r}-${attackerCoord.c}`);
+  if (aEl) {
+    const animCls = atkU.team === 'player' ? 'lunge-up' : 'lunge-down';
+    aEl.classList.remove(animCls);
+    void aEl.offsetWidth;
+    aEl.classList.add(animCls);
+  }
+
+  atkU.mana = Math.min(100, (atkU.mana || 0) + 25);
+  let isUlt = (atkU.mana >= 100);
+
+  if (isUlt) {
+    atkU.mana = 0;
+    try { AudioEngine.ult(); } catch (err) {}
+    showAbilityBanner(attackerCoord.r, attackerCoord.c, atkU.ability || 'Ultimate', '✨');
+    if (aCell) {
+      const v = document.createElement('div');
+      v.className = 'vfx-ultimate';
+      aCell.appendChild(v);
+      setTimeout(() => v.remove(), 400);
+    }
+  }
+
+  let dmg = Math.round(atkU.atk * 0.85 * (isUlt ? 1.4 : 1.0));
+  if (atkU.equippedArtifact?.id === 'starshell') dmg += 16;
+  applyDamageWithShield(tgtU, dmg);
+
+  try { AudioEngine.hit(); } catch (err) {}
+  showDamageText(targetCoord.r, targetCoord.c, dmg, false, isUlt ? '#38bdf8' : '#a78bfa');
+
+  if (tgtU.currentHp <= 0) {
+    state.board[targetCoord.r][targetCoord.c] = null;
+  }
+}
+
 export function resolveClash(state, p, e, tick) {
   const pU = state.board[p.r][p.c], eU = state.board[e.r][e.c];
   if (!pU || !eU) return;
@@ -445,6 +529,7 @@ export function resolveClash(state, p, e, tick) {
   if (pIsUlt) {
     pU.mana = 0;
     try { AudioEngine.ult(); } catch (err) {}
+    showAbilityBanner(p.r, p.c, pU.ability || 'Ultimate', '⚡');
     if (pCell) {
       const v = document.createElement('div');
       v.className = 'vfx-ultimate';
@@ -455,11 +540,15 @@ export function resolveClash(state, p, e, tick) {
       const baseShield = pU.level === 3 ? 120 : (pU.level === 2 ? 85 : 65);
       addShieldWithCap(pU, baseShield);
       showDamageText(p.r, p.c, "🛡️ SHIELD!", false, '#38bdf8');
+    } else if (pU.ability === 'Tail Slap') {
+      pU.currentHp = Math.min(pU.maxHp, pU.currentHp + 35);
+      showDamageText(p.r, p.c, "+35 HP", false, '#22c55e');
     }
   }
 
   if (eIsUlt) {
     eU.mana = 0;
+    showAbilityBanner(e.r, e.c, eU.ability || 'Ultimate', '💥');
     if (eU.ability && (eU.ability.includes('Shield') || eU.ability.includes('Armor'))) {
       const baseShield = eU.level === 3 ? 110 : (eU.level === 2 ? 80 : 60);
       addShieldWithCap(eU, baseShield);

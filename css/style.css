@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg-main: #050813;
   --bg-surface: #0a1122;
   --bg-card: #0f1933;
@@ -859,6 +859,42 @@ header {
 @keyframes floatAnim {
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-20px); }
+}
+
+.floating-ability {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.95), rgba(99, 102, 241, 0.95));
+  color: #fff;
+  border: 1px solid #67e8f9;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
+  animation: floatAbilityAnim 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+  z-index: 30;
+}
+@keyframes floatAbilityAnim {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.6) translateY(4px); }
+  20% { opacity: 1; transform: translateX(-50%) scale(1.1) translateY(-4px); }
+  80% { opacity: 1; transform: translateX(-50%) scale(1.0) translateY(-14px); }
+  100% { opacity: 0; transform: translateX(-50%) scale(0.9) translateY(-26px); }
+}
+
+.unit.mana-ready {
+  box-shadow: 0 0 14px var(--accent-mana) !important;
+  border-color: #38bdf8 !important;
+  animation: manaPulseAnim 1s ease-in-out infinite alternate;
+}
+@keyframes manaPulseAnim {
+  0% { box-shadow: 0 0 8px rgba(6, 182, 212, 0.6); }
+  100% { box-shadow: 0 0 16px rgba(6, 182, 212, 1); transform: scale(1.02); }
 }
 
 /* TOAST */

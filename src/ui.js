@@ -1,4 +1,4 @@
-﻿import { SVG_ICONS, PLAYER_LEVELS, SECRET_MUTATION_TABLE } from './config.js';
+import { SVG_ICONS, PLAYER_LEVELS, SECRET_MUTATION_TABLE } from './config.js';
 import { AudioEngine } from './audio.js';
 
 let toastTimer = null;
@@ -34,7 +34,8 @@ export function createUnitEl(unit, isSelected, highlightedTrait = null, customId
   const div = document.createElement('div');
   const uType = unit.type || unit.species;
   const isGlowing = highlightedTrait && (uType === highlightedTrait || unit.role === highlightedTrait);
-  div.className = `unit ${uType} ${isSelected ? 'unit-selected' : ''} ${isGlowing ? 'syn-glow' : ''}`;
+  const isManaReady = (unit.mana || 0) >= 100;
+  div.className = `unit ${uType} ${isSelected ? 'unit-selected' : ''} ${isGlowing ? 'syn-glow' : ''} ${isManaReady ? 'mana-ready' : ''}`;
   if (customId) div.id = customId;
 
   const starTxt = unit.level === 3 ? '★★★' : (unit.level === 2 ? '★★' : '★');
