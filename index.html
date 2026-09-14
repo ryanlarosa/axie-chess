@@ -1,0 +1,284 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Axie Lunacia Fall - Tactical Discovery Auto-Battler</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+  <div id="toast"></div>
+
+  <!-- 1. START MENU -->
+  <div id="main-menu">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+      <div class="menu-badge">AXIE VIBATHON 2026</div>
+      <div class="menu-title">LUNACIA FALL</div>
+      <div class="menu-subtitle">Tactical Discovery Auto-Battler</div>
+    </div>
+
+    <img src="https://axiecdn.axieinfinity.com/axies/10549077/axie/axie-full-transparent.png" class="menu-hero-img" alt="Axie" />
+
+    <div class="menu-loop-card">
+      <div style="font-weight:900; color:var(--accent-gold); margin-bottom:4px; font-size:10.5px;">GAMEPLAY LOOP:</div>
+      <div class="loop-step"><span>🪙</span> <b>Build:</b> Draft Axies & bank gold for +1g interest per 10g.</div>
+      <div class="loop-step"><span>✨</span> <b>Merge:</b> 3 identical units auto-ascend into ★★ & ★★★.</div>
+      <div class="loop-step"><span>🧬</span> <b>Mutate:</b> Drag two ★★ opposites to breed Secret Classes!</div>
+      <div class="loop-step"><span>👑</span> <b>Survive:</b> Slay Titan bosses & equip Runic Artifacts.</div>
+    </div>
+
+    <button class="btn-start" id="start-btn">ENTER TOURNAMENT</button>
+  </div>
+
+  <!-- 2. COMMANDER SELECTION -->
+  <div id="commander-modal" class="modal-overlay">
+    <div style="font-size: 16px; font-weight: 900; color: var(--accent-gold);">SELECT COMMANDER BOON</div>
+    <div style="font-size: 10px; color: #94a3b8; margin-bottom: 4px;">Choose your active modifier for this tournament.</div>
+
+    <div class="commander-card" data-cmd="oak">
+      <div style="font-size: 13px; font-weight: 900; color: var(--plant);">🛡️ Captain Oak (Bastion)</div>
+      <div style="font-size: 10px; color: #cbd5e1; line-height: 1.4;"><b>Living Bastion:</b> Frontline units gain +40 Shield. Loss damage taken reduced by 3.</div>
+    </div>
+
+    <div class="commander-card" data-cmd="ronin">
+      <div style="font-size: 13px; font-weight: 900; color: var(--beast);">⚔️ Ronin Shihan (Striker)</div>
+      <div style="font-size: 10px; color: #cbd5e1; line-height: 1.4;"><b>Blood Pact:</b> First battle crit deals +50% extra damage and awards +1 Gold.</div>
+    </div>
+
+    <div class="commander-card" data-cmd="chimera">
+      <div style="font-size: 13px; font-weight: 900; color: var(--accent-gold);">🧪 Chimera Alchemist (Breeder)</div>
+      <div style="font-size: 10px; color: #cbd5e1; line-height: 1.4;"><b>Accelerated Gene:</b> Merges give +25 bonus AXP. Higher-tier Axies unlock 1 level earlier.</div>
+    </div>
+  </div>
+
+  <!-- 3. TOP HUD -->
+  <header>
+    <div class="hud-row-main">
+      <div class="hud-chip">🪙 <span id="gold">10</span> <span id="interest-hint" style="color:var(--accent-gold); font-size:7.5px;">(+1g int)</span></div>
+      <div class="hud-chip">
+        ❤️ <span id="hp">100</span>
+        <div class="player-hp-bar"><div class="player-hp-fill" id="hp-fill"></div></div>
+      </div>
+      <div class="hud-chip" id="cap-chip">👥 <span id="cap-txt">0/2</span></div>
+      <div class="hud-chip" id="cmd-badge" style="color:var(--accent-gold);">👑 Cmd</div>
+    </div>
+
+    <div class="hud-row-sub">
+      <div class="progression-strip">
+        <span style="font-weight:900; color:var(--accent-gold);">PLAYER LV <span id="player-level">1</span></span>
+        <div class="axp-track"><div class="axp-fill" id="axp-fill"></div></div>
+        <span style="color:#94a3b8;"><span id="current-axp">0</span>/<span id="next-axp">100</span> AXP</span>
+        <span class="hud-chip" id="tier-badge" style="color:var(--accent-blue); padding:1px 4px; font-size:8px;">T1</span>
+      </div>
+      <button class="btn-hud" id="open-guide-btn">📘 GUIDE</button>
+      <button class="btn-hud" id="open-log-btn">📖 LOG</button>
+      <button class="btn-hud" id="open-lobby-btn">🏆 (8/8)</button>
+    </div>
+  </header>
+
+  <!-- ONBOARDING TIP BAR -->
+  <div id="onboarding-bar">
+    <span class="onboard-badge">TIP</span>
+    <span id="onboard-msg">Draft an Axie from the shop (2g) to build your squad.</span>
+  </div>
+
+  <div id="stage-ribbon"></div>
+  <div id="synergy-bar"></div>
+  <div id="opponent-banner">ROUND 1: LUNACIAN RIVAL</div>
+
+  <!-- 4. ARENA (3x4) -->
+  <div id="arena-wrapper">
+    <div id="arena">
+      <div class="cell enemy-zone" data-r="0" data-c="0"></div>
+      <div class="cell enemy-zone" data-r="0" data-c="1"></div>
+      <div class="cell enemy-zone" data-r="0" data-c="2"></div>
+      <div class="cell enemy-zone" data-r="1" data-c="0"></div>
+      <div class="cell enemy-zone" data-r="1" data-c="1"></div>
+      <div class="cell enemy-zone" data-r="1" data-c="2"></div>
+
+      <div class="cell player-zone" data-r="2" data-c="0"></div>
+      <div class="cell player-zone" data-r="2" data-c="1"></div>
+      <div class="cell player-zone" data-r="2" data-c="2"></div>
+      <div class="cell player-zone" data-r="3" data-c="0"></div>
+      <div class="cell player-zone" data-r="3" data-c="1"></div>
+      <div class="cell player-zone" data-r="3" data-c="2"></div>
+    </div>
+  </div>
+
+  <!-- 5. BENCH & ARTIFACT TRAY -->
+  <div id="bench-section">
+    <div class="bench-header">
+      <span>BENCH (5 SLOTS)</span>
+      <span>RUNIC CHARMS (2)</span>
+    </div>
+    <div class="bench-row">
+      <div class="bench-grid" id="bench-container">
+        <div class="bench-slot" data-idx="0"></div>
+        <div class="bench-slot" data-idx="1"></div>
+        <div class="bench-slot" data-idx="2"></div>
+        <div class="bench-slot" data-idx="3"></div>
+        <div class="bench-slot" data-idx="4"></div>
+      </div>
+      <div class="artifact-stash" id="artifact-stash">
+        <div class="artifact-slot" id="art-slot-0" data-art="0"></div>
+        <div class="artifact-slot" id="art-slot-1" data-art="1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. CONTROLS & 4-CARD SHOP -->
+  <div id="controls">
+    <div class="shop-grid" id="shop-container"></div>
+    <div class="btn-row">
+      <button class="btn btn-reroll" id="reroll-btn">🔄 2g</button>
+      <button class="btn btn-sell" id="sell-btn">SELL (+2g)</button>
+      <button class="btn btn-battle" id="battle-btn">CLASH</button>
+    </div>
+  </div>
+
+  <!-- 7. SECRET MUTATION CELEBRATION MODAL -->
+  <div id="mutation-discovery-modal">
+    <div style="font-size: 11px; color: var(--accent-gold); font-weight: 900; letter-spacing: 2px;">★ GENETIC ASCENSION ★</div>
+    <div style="font-size: 20px; font-weight: 900; color: #fff;">SECRET MUTATION DISCOVERED!</div>
+
+    <div class="mutation-card-showcase">
+      <img id="mut-showcase-img" class="mutation-showcase-img" src="" alt="Secret Axie" />
+      <div id="mut-showcase-name" style="font-size: 15px; font-weight: 900; color: var(--accent-gold);">Axie Name</div>
+      <div id="mut-showcase-species" style="font-size: 9.5px; color: #38bdf8; font-weight: 800;">Secret Class • Role</div>
+      <div id="mut-showcase-ability" style="font-size: 9px; color: #cbd5e1; background: rgba(0,0,0,0.5); padding: 4px 6px; border-radius: 4px;">Ability description</div>
+    </div>
+
+    <button class="btn-start" id="close-mut-btn" style="width: 75%; padding: 10px;">DEPLOY TO BATTLEFIELD</button>
+  </div>
+
+  <!-- 8. GUIDE MODAL -->
+  <div class="modal-overlay" id="guide-modal">
+    <div class="modal-sheet guide-sheet">
+      <div class="modal-header">
+        <span style="font-size:13px; font-weight:900; color:var(--accent-blue);">📘 GAME GUIDE & DISCOVERY</span>
+        <button class="modal-close-btn" id="close-guide-btn">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; padding-right:2px;">
+        <div class="guide-card">
+          <div class="guide-title">✨ 3-STAR MERGE VS SECRET MUTATION</div>
+          <div>• <b>Axie Star Merging:</b> Collect <b>3 identical Level 1 Axies</b> to auto-fuse into <b>Level 2 (★★)</b>. 3 Level 2s auto-fuse into <b>Level 3 (★★★)</b>.</div>
+          <div>• <b>Secret Mutations:</b> Dragging two <i>different</i> Level 2 (★★) Axies of opposing species groups cross-breeds a rare, secret class mutation.</div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-title">⚡ COMBAT MANA & ACTIVE ULTIMATES</div>
+          <div>• Cyan bar = <b>Mana (0/100)</b>. Units gain +25 on attack and +15 when struck.</div>
+          <div>• At 100 Mana, Axies cast their signature ultimate on their next turn!</div>
+          <div>• <b>Grey Shield Bars:</b> Shields absorb incoming damage completely before green HP drops.</div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-title">🛡️ HYBRIDS & ROLES</div>
+          <div>• <b>Sponge Shrimpy:</b> Tank Aqua (Frontline Vanguard for fragile Aquas).</div>
+          <div>• <b>Cactus Brawler:</b> Slasher Plant (High-burst physical plant).</div>
+          <div>• <b>Sneaky Tooth:</b> Slasher Reptile (Shield-piercing assassin).</div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-title">🪙 ECONOMY & INTEREST</div>
+          <div>• Earn <b>+1g bonus interest per 10g banked</b> in your treasury at round end (max +3g at 30g).</div>
+          <div>• Maximum army size scales with Player Level (Lv 1=2, Lv 2=3, Lv 3=4, Lv 4=5, Lv 5+=6).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. BOSS ARTIFACT MODAL -->
+  <div class="modal-overlay" id="artifact-modal">
+    <div class="modal-sheet" style="border-top-color: var(--accent-gold);">
+      <div style="font-size:13px; font-weight:900; color:var(--accent-gold);">👑 TITAN SLAIN: CHOOSE AN ARTIFACT</div>
+      <div style="font-size:9.5px; color:var(--text-muted);">Equip charms on your key carries from the 2-slot stash.</div>
+      <div id="artifact-choices-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+  </div>
+
+  <!-- 10. AXIE INSPECTION MODAL -->
+  <div class="modal-overlay" id="inspect-modal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span style="font-size:13px; font-weight:900; color:var(--accent-gold);" id="insp-name">Axie</span>
+        <button class="modal-close-btn" id="close-inspect-btn">✕</button>
+      </div>
+      <div style="display:flex; justify-content:space-around; background:#060a14; border:1px solid var(--panel-border); border-radius:6px; padding:6px; font-size:10px; font-weight:800;">
+        <div>❤️ HP: <span id="insp-hp" style="color:#22c55e;">0</span></div>
+        <div>⚔️ ATK: <span id="insp-atk" style="color:#f59e0b;">0</span></div>
+        <div>⭐ Axie Lvl: <span id="insp-star" style="color:#38bdf8;">★</span></div>
+        <div>💎 Tier: <span id="insp-tier" style="color:#a855f7;">T1</span></div>
+      </div>
+      <div style="font-size:10px; color:#cbd5e1; background:rgba(255,255,255,0.03); padding:8px; border-radius:6px; line-height:1.4;">
+        <div><b>Body Part:</b> <span id="insp-part">None</span></div>
+        <div><b>Identity:</b> <span id="insp-tags">None</span></div>
+        <div><b>Equipped Charm:</b> <span id="insp-artifact" style="color:var(--accent-gold);">None</span></div>
+        <div style="margin-top:4px;"><b>Ultimate:</b> <span id="insp-ability" style="color:#38bdf8;">Ability</span></div>
+        <div style="font-size:9px; color:#94a3b8;" id="insp-ability-desc">Desc</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. STANDINGS MODAL -->
+  <div class="modal-overlay" id="lobby-modal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <span style="font-weight:900; color:#38bdf8; font-size:12px;">🏆 TOURNAMENT STANDINGS</span>
+        <button class="modal-close-btn" id="close-lobby-btn">✕</button>
+      </div>
+      <div id="lobby-list" style="display:flex; flex-direction:column; gap:4px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- 12. DISCOVERY LOG MODAL -->
+  <div class="modal-overlay" id="discovery-modal">
+    <div class="modal-sheet log-sheet">
+      <div class="modal-header">
+        <span style="font-weight:900; color:var(--accent-gold); font-size:12px;">📖 AXIE DISCOVERY & MUTATION LOG</span>
+        <button class="modal-close-btn" id="close-discovery-btn">✕</button>
+      </div>
+      <div class="log-grid" id="discovery-list"></div>
+    </div>
+  </div>
+
+  <!-- 13. VICTORY MODAL -->
+  <div class="modal-overlay" id="victory-modal">
+    <div style="background: radial-gradient(circle at 50% 30%, #1e1b4b 0%, #030712 100%); width: 88%; max-width: 360px; border-radius: 12px; border: 2px solid var(--accent-gold); padding: 20px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin: auto; pointer-events: auto;">
+      <div style="font-size: 10px; color: var(--accent-gold); font-weight: 800; letter-spacing: 1px;">TOURNAMENT WON</div>
+      <div style="font-size: 22px; font-weight: 900; color: #fff;">🏆 CHAMPION!</div>
+      <div style="font-size: 10px; color: #94a3b8;">You outlasted all 7 rivals in the Lunacian Arena.</div>
+
+      <div style="background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 8px; padding: 8px; width: 100%; font-size: 10px; display: flex; justify-content: space-around;">
+        <div>⭐ <b>Player Lv</b><br><span id="vic-level" style="color:var(--accent-gold); font-weight:900;">1</span></div>
+        <div>⚔️ <b>Rounds</b><br><span id="vic-stage" style="color:#38bdf8; font-weight:900;">1</span></div>
+        <div>🪙 <b>Gold</b><br><span id="vic-gold" style="color:#fbbf24; font-weight:900;">0</span></div>
+      </div>
+
+      <button class="btn-start" style="width: 100%; padding: 10px; margin-top: 4px;" id="vic-play-btn">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- 14. GAME OVER SUMMARY MODAL -->
+  <div class="modal-overlay" id="gameover-modal">
+    <div style="background: radial-gradient(circle at 50% 30%, #3f0d12 0%, #03040a 100%); width: 88%; max-width: 360px; border-radius: 12px; border: 2px solid var(--accent-red); padding: 20px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin: auto; pointer-events: auto;">
+      <div style="font-size: 10px; color: #f87171; font-weight: 800; letter-spacing: 1px;">TOURNAMENT RUN ENDED</div>
+      <div style="font-size: 22px; font-weight: 900; color: #fff;">💀 DEFEATED</div>
+
+      <div style="background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 8px; padding: 10px; width: 100%; font-size: 10px; display: flex; flex-direction:column; gap:4px; text-align:left;">
+        <div style="display:flex; justify-content:space-between;"><span>Stage Reached:</span> <b id="go-stage" style="color:#38bdf8;">1</b></div>
+        <div style="display:flex; justify-content:space-between;"><span>Player Level:</span> <b id="go-level" style="color:var(--accent-gold);">1</b></div>
+        <div style="display:flex; justify-content:space-between;"><span>Mutations Discovered:</span> <b id="go-mutations" style="color:#a855f7;">0/3</b></div>
+        <div style="display:flex; justify-content:space-between;"><span>Remaining Rivals:</span> <b id="go-rivals" style="color:#ef4444;">7</b></div>
+      </div>
+
+      <button class="btn-start" style="width: 100%; padding: 10px; margin-top: 4px;" id="go-play-btn">PLAY AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
