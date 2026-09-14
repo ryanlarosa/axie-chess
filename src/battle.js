@@ -465,11 +465,20 @@ function applyDamageWithShield(unit, dmg) {
 
 export function showAbilityBanner(r, c, abilityName, icon = '⚡') {
   const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
-  if (!cell) return;
+  const arenaWrapper = document.getElementById('arena-wrapper') || document.body;
+  if (!cell || !arenaWrapper) return;
+
+  const cellRect = cell.getBoundingClientRect();
+  const wrapperRect = arenaWrapper.getBoundingClientRect();
+
   const banner = document.createElement('div');
   banner.className = 'floating-ability';
+  banner.style.position = 'absolute';
+  banner.style.left = `${cellRect.left - wrapperRect.left + cellRect.width / 2}px`;
+  banner.style.top = `${cellRect.top - wrapperRect.top}px`;
   banner.innerHTML = `${icon} ${abilityName}!`;
-  cell.appendChild(banner);
+
+  arenaWrapper.appendChild(banner);
   setTimeout(() => banner.remove(), 1100);
 }
 
@@ -659,12 +668,22 @@ export function resolveClash(state, p, e, tick) {
 
 export function showDamageText(r, c, dmg, isCrit, customColor = null) {
   const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
-  if (!cell) return;
+  const arenaWrapper = document.getElementById('arena-wrapper') || document.body;
+  if (!cell || !arenaWrapper) return;
+
+  const cellRect = cell.getBoundingClientRect();
+  const wrapperRect = arenaWrapper.getBoundingClientRect();
+
   const txt = document.createElement('div');
   txt.className = 'floating-num';
+  txt.style.position = 'absolute';
+  txt.style.left = `${cellRect.left - wrapperRect.left + cellRect.width / 2}px`;
+  txt.style.top = `${cellRect.top - wrapperRect.top + cellRect.height / 2}px`;
+  txt.style.transform = 'translate(-50%, -50%)';
   txt.style.color = customColor || (isCrit ? '#facc15' : '#f87171');
   txt.innerText = isCrit ? `💥 ${dmg}` : `-${dmg}`;
-  cell.appendChild(txt);
+
+  arenaWrapper.appendChild(txt);
   setTimeout(() => txt.remove(), 700);
 }
 
