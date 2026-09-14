@@ -1,4 +1,4 @@
-﻿import { AXIE_ROSTER, BOSS_ARTIFACTS } from './config.js';
+import { AXIE_ROSTER, BOSS_ARTIFACTS } from './config.js';
 import { AudioEngine, triggerScreenShake } from './audio.js';
 import { showToast, openModal, getUniqueSynergyCounts, renderBoard, updateUI } from './ui.js';
 
@@ -262,17 +262,17 @@ export function applyPreBattleSynergies(state) {
     for (let r = 2; r <= 3; r++) {
       for (let c = 0; c < 3; c++) {
         if (state.board[r][c]?.role === 'Vanguard') {
-          state.board[r][c].shield = (state.board[r][c].shield || 0) + 80;
+          addShieldWithCap(state.board[r][c], 50);
         }
       }
     }
-    showToast("🛡️ Vanguard (2): +80 Grey Shield!");
+    showToast("🛡️ Vanguard (2): +50 Grey Shield!");
   }
 
   if (state.activeCommander === 'oak') {
     for (let c = 0; c < 3; c++) {
       if (state.board[2][c]) {
-        state.board[2][c].shield = (state.board[2][c].shield || 0) + 40;
+        addShieldWithCap(state.board[2][c], 30);
       }
     }
   }
@@ -281,7 +281,7 @@ export function applyPreBattleSynergies(state) {
     for (let c = 0; c < 3; c++) {
       const u = state.board[r][c];
       if (u?.equippedArtifact?.id === 'quartz') {
-        u.shield = (u.shield || 0) + 75;
+        addShieldWithCap(u, 75);
       }
     }
   }
@@ -290,11 +290,11 @@ export function applyPreBattleSynergies(state) {
     for (let r = 2; r <= 3; r++) {
       for (let c = 0; c < 3; c++) {
         if (state.board[r][c]?.type === 'Plant') {
-          state.board[r][c].shield = (state.board[r][c].shield || 0) + 60;
+          addShieldWithCap(state.board[r][c], 40);
         }
       }
     }
-    showToast("🌿 Plant (2): +60 Shield!");
+    showToast("🌿 Plant (2): +40 Shield!");
   }
 
   if ((pRoles['Marksman'] || 0) >= 2) {
@@ -320,7 +320,7 @@ export function applyPreBattleSynergies(state) {
     for (let r = 0; r <= 1; r++) {
       for (let c = 0; c < 3; c++) {
         if (state.board[r][c]?.role === 'Vanguard') {
-          state.board[r][c].shield = (state.board[r][c].shield || 0) + 80;
+          addShieldWithCap(state.board[r][c], 50);
         }
       }
     }
@@ -329,7 +329,7 @@ export function applyPreBattleSynergies(state) {
     for (let r = 0; r <= 1; r++) {
       for (let c = 0; c < 3; c++) {
         if (state.board[r][c]?.type === 'Plant') {
-          state.board[r][c].shield = (state.board[r][c].shield || 0) + 60;
+          addShieldWithCap(state.board[r][c], 40);
         }
       }
     }
@@ -397,6 +397,13 @@ function triggerRoleVfx(cellEl, role) {
   }
 }
 
+function addShieldWithCap(unit, amount) {
+  if (!unit) return;
+  const maxCap = Math.round((unit.maxHp || 200) * 0.55); // Shield can never exceed 55% of Max HP
+  const current = unit.shield || 0;
+  unit.shield = Math.min(maxCap, current + amount);
+}
+
 function applyDamageWithShield(unit, dmg) {
   if (!unit.shield) unit.shield = 0;
   if (unit.shield >= dmg) {
@@ -445,7 +452,8 @@ export function resolveClash(state, p, e, tick) {
       setTimeout(() => v.remove(), 400);
     }
     if (pU.ability && (pU.ability.includes('Shield') || pU.ability.includes('Armor') || pU.ability.includes('Bastion'))) {
-      pU.shield = (pU.shield || 0) + 110;
+      const baseShield = pU.level === 3 ? 120 : (pU.level === 2 ? 85 : 65);
+      addShieldWithCap(pU, baseShield);
       showDamageText(p.r, p.c, "🛡️ SHIELD!", false, '#38bdf8');
     }
   }
@@ -453,7 +461,8 @@ export function resolveClash(state, p, e, tick) {
   if (eIsUlt) {
     eU.mana = 0;
     if (eU.ability && (eU.ability.includes('Shield') || eU.ability.includes('Armor'))) {
-      eU.shield = (eU.shield || 0) + 90;
+      const baseShield = eU.level === 3 ? 110 : (eU.level === 2 ? 80 : 60);
+      addShieldWithCap(eU, baseShield);
       showDamageText(e.r, e.c, "🛡️ SHIELD!", false, '#38bdf8');
     }
   }

@@ -1,4 +1,4 @@
-﻿export const SVG_ICONS = {
+export const SVG_ICONS = {
   Plant: `<svg viewBox="0 0 24 24" style="color:var(--plant)"><path d="M12 2a10 10 0 0 0-8 16c2-4 5-6 8-6 0-3 3-6 7-6a10 10 0 0 0-7-4zm0 12c-3.5 0-6 2-7 6a10 10 0 0 0 14 0c-1-4-3.5-6-7-6z"/></svg>`,
   Beast: `<svg viewBox="0 0 24 24" style="color:var(--beast)"><path d="M4 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-7-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-4 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm3 4c-4.5 0-8 3-8 7 0 2 3.5 2 8 2s8 0 8-2c0-4-3.5-7-8-7z"/></svg>`,
   Aqua: `<svg viewBox="0 0 24 24" style="color:var(--aqua)"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
@@ -49,7 +49,7 @@ export const BOSS_ARTIFACTS = {
 
 export const AXIE_ROSTER = [
   // TIER 1
-  { id: 't1_pump', name: 'Pumpkin Oak', species: 'Plant', tier: 1, role: 'Vanguard', bodyPart: 'Pumpkin', cost: 2, baseHP: 230, baseAttack: 16, ability: 'Shield Wall', abilityDesc: 'Gains +110 grey shield.', img: 'https://axiecdn.axieinfinity.com/axies/10549079/axie/axie-full-transparent.png' },
+  { id: 't1_pump', name: 'Pumpkin Oak', species: 'Plant', tier: 1, role: 'Vanguard', bodyPart: 'Pumpkin', cost: 2, baseHP: 200, baseAttack: 16, ability: 'Shield Wall', abilityDesc: 'Gains +65 grey shield (capped at 50% max HP).', img: 'https://axiecdn.axieinfinity.com/axies/10549079/axie/axie-full-transparent.png' },
   { id: 't1_ronin', name: 'Ronin Nut', species: 'Beast', tier: 1, role: 'Slasher', bodyPart: 'Ronin', cost: 2, baseHP: 110, baseAttack: 36, ability: 'Single Combat', abilityDesc: 'Guaranteed 1.8x Critical Strike.', img: 'https://axiecdn.axieinfinity.com/axies/10549077/axie/axie-full-transparent.png' },
   { id: 't1_nimo', name: 'Nimo Fin', species: 'Aqua', tier: 1, role: 'Marksman', bodyPart: 'Nimo', cost: 2, baseHP: 135, baseAttack: 26, ability: 'Tail Slap', abilityDesc: 'Restores +25 HP to lowest ally.', img: 'https://axiecdn.axieinfinity.com/axies/10549078/axie/axie-full-transparent.png' },
   { id: 't1_kest', name: 'Kestrel Wing', species: 'Bird', tier: 1, role: 'Marksman', bodyPart: 'Kestrel', cost: 2, baseHP: 100, baseAttack: 42, ability: 'Air Superiority', abilityDesc: 'Strikes twice in rapid burst.', img: 'https://axiecdn.axieinfinity.com/axies/10549076/axie/axie-full-transparent.png' },
