@@ -93,7 +93,6 @@ export function renderBoard(state, checkSecretFusionFn) {
     for (let c = 0; c < 3; c++) {
       const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
       if (!cell) continue;
-      cell.innerHTML = '';
       cell.classList.remove('highlight-target', 'highlight-fusion');
       const unit = state.board[r][c];
 
@@ -105,7 +104,37 @@ export function renderBoard(state, checkSecretFusionFn) {
         else if (checkSecretFusionFn && checkSecretFusionFn(sUnit, unit)) cell.classList.add('highlight-fusion');
       }
 
-      if (unit) {
+      const existingUnitEl = cell.querySelector('.unit');
+
+      if (!unit) {
+        if (existingUnitEl) cell.innerHTML = '';
+        continue;
+      }
+
+      // If unit already exists in DOM at this position, update bars in-place without killing animations
+      if (existingUnitEl && existingUnitEl.id === `unit-${r}-${c}`) {
+        const hpPct = Math.max(0, Math.min(100, (unit.currentHp / unit.maxHp) * 100));
+        const shieldPct = Math.min(100, ((unit.shield || 0) / unit.maxHp) * 100);
+        const manaPct = Math.min(100, ((unit.mana || 0) / 100) * 100);
+
+        const hpBar = existingUnitEl.querySelector('.hp-fill');
+        if (hpBar) hpBar.style.width = `${hpPct}%`;
+        const shieldBar = existingUnitEl.querySelector('.shield-fill');
+        if (shieldBar) shieldBar.style.width = `${shieldPct}%`;
+        const manaBar = existingUnitEl.querySelector('.mana-fill');
+        if (manaBar) manaBar.style.width = `${manaPct}%`;
+
+        const statChip = existingUnitEl.querySelector('.unit-stat-chip');
+        if (statChip) {
+          statChip.innerHTML = `
+            <span style="color:#22c55e">❤️${unit.currentHp}</span>
+            <span style="color:#f59e0b">⚔️${unit.atk}</span>
+          `;
+        }
+        if ((unit.mana || 0) >= 100) existingUnitEl.classList.add('mana-ready');
+        else existingUnitEl.classList.remove('mana-ready');
+      } else {
+        cell.innerHTML = '';
         const isSelected = state.selectedSource?.type === 'board' && state.selectedSource?.index.r === r && state.selectedSource?.index.c === c;
         cell.appendChild(createUnitEl(unit, isSelected, state.highlightedTrait, `unit-${r}-${c}`));
       }
