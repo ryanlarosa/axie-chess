@@ -393,6 +393,20 @@ export function updateUI(state, checkSecretFusionFn, toggleTraitFn) {
     interestHint.style.fontWeight = currentInterest > 0 ? '900' : '700';
   }
 
+  const sellBtn = document.getElementById('sell-btn');
+  if (sellBtn) {
+    if (state.selectedSource && !state.isBattling) {
+      let target = state.selectedSource.type === 'bench' 
+        ? state.bench[state.selectedSource.index] 
+        : state.board[state.selectedSource.index.r][state.selectedSource.index.c];
+      const refund = target ? (target.cost || 2) : 2;
+      sellBtn.innerText = `SELL (+${refund}g)`;
+      sellBtn.style.display = 'flex';
+    } else {
+      sellBtn.style.display = 'none';
+    }
+  }
+
   updateStageRibbon(state.stage);
   updateSynergyBar(state, toggleTraitFn);
   updateLobbyDrawer(state.tournamentPlayers);
