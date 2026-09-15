@@ -645,40 +645,14 @@ export function resolveClash(state, p, e, tick) {
     showToast("⚔️ Ronin Shihan: +1g on Crit Strike!");
   }
 
-  // Axie Core Class Advantage Rock-Paper-Scissors:
-  // Beast/Bug > Plant/Reptile > Aqua/Bird > Beast/Bug
-  // Mech/Dusk/Dawn deal neutral 1.0x baseline
-  const calcClassAdvantage = (atkSpecies, defSpecies) => {
-    const isBeastBug = ['Beast', 'Bug'].includes(atkSpecies);
-    const isPlantRep = ['Plant', 'Reptile'].includes(atkSpecies);
-    const isAquaBird = ['Aqua', 'Bird'].includes(atkSpecies);
-
-    const isDefPlantRep = ['Plant', 'Reptile'].includes(defSpecies);
-    const isDefAquaBird = ['Aqua', 'Bird'].includes(defSpecies);
-    const isDefBeastBug = ['Beast', 'Bug'].includes(defSpecies);
-
-    if (isBeastBug && isDefPlantRep) return 1.15;
-    if (isPlantRep && isDefAquaBird) return 1.15;
-    if (isAquaBird && isDefBeastBug) return 1.15;
-
-    if (isBeastBug && isDefAquaBird) return 0.90;
-    if (isPlantRep && isDefBeastBug) return 0.90;
-    if (isAquaBird && isDefPlantRep) return 0.90;
-
-    return 1.0;
-  };
-
-  const pAdv = calcClassAdvantage(pType, eType);
-  const eAdv = calcClassAdvantage(eType, pType);
-
-  let pDmg = Math.round(pU.atk * (isCrit ? critMult : 1.0) * (pIsUlt ? 1.4 : 1.0) * pAdv) * strikes;
+  let pDmg = Math.round(pU.atk * (isCrit ? critMult : 1.0) * (pIsUlt ? 1.4 : 1.0)) * strikes;
   if (pU.equippedArtifact?.id === 'starshell' || pU.ability === 'Shield Piercer') pDmg += 16;
 
   let eCritChance = 0;
   if ((eRoles['Slasher'] || 0) >= 2) eCritChance += 0.35;
   if ((eOrigins['Beast'] || 0) >= 2 && eType === 'Beast') eCritChance += 0.30;
   let isEnemyCrit = Math.random() < eCritChance;
-  let eDmg = Math.round(eU.atk * (isEnemyCrit ? 1.75 : 1.0) * (eIsUlt ? 1.3 : 1.0) * eAdv);
+  let eDmg = Math.round(eU.atk * (isEnemyCrit ? 1.75 : 1.0) * (eIsUlt ? 1.3 : 1.0));
 
   if ((pOrigins['Bug'] || 0) >= 2 && pType === 'Bug') eDmg = Math.round(eDmg * 0.7);
   if ((eOrigins['Bug'] || 0) >= 2 && eType === 'Bug') pDmg = Math.round(pDmg * 0.7);
