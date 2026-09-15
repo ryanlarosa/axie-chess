@@ -495,11 +495,38 @@ function resolveRangedAttack(state, attackerCoord, targetCoord, tick) {
 
   const aCell = document.querySelector(`.cell[data-r="${attackerCoord.r}"][data-c="${attackerCoord.c}"]`);
   const aEl = document.getElementById(`unit-${attackerCoord.r}-${attackerCoord.c}`);
+  const tEl = document.getElementById(`unit-${targetCoord.r}-${targetCoord.c}`);
+  const arenaWrapper = document.getElementById('arena-wrapper');
+
+  // 1. Recoil animation for ranged shooter
   if (aEl) {
-    const animCls = atkU.team === 'player' ? 'lunge-up' : 'lunge-down';
-    aEl.classList.remove(animCls);
+    const recoilCls = atkU.team === 'player' ? 'attack-recoil-up' : 'attack-recoil-down';
+    aEl.classList.remove(recoilCls);
     void aEl.offsetWidth;
-    aEl.classList.add(animCls);
+    aEl.classList.add(recoilCls);
+  }
+
+  // 2. Flying energy projectile
+  if (arenaWrapper && aCell) {
+    const tCell = document.querySelector(`.cell[data-r="${targetCoord.r}"][data-c="${targetCoord.c}"]`);
+    if (tCell) {
+      const aRect = aCell.getBoundingClientRect();
+      const tRect = tCell.getBoundingClientRect();
+      const wRect = arenaWrapper.getBoundingClientRect();
+
+      const proj = document.createElement('div');
+      proj.className = 'combat-projectile';
+      proj.style.left = `${aRect.left - wRect.left + aRect.width / 2 - 7}px`;
+      proj.style.top = `${aRect.top - wRect.top + aRect.height / 2 - 7}px`;
+      arenaWrapper.appendChild(proj);
+
+      requestAnimationFrame(() => {
+        const dx = (tRect.left + tRect.width / 2) - (aRect.left + aRect.width / 2);
+        const dy = (tRect.top + tRect.height / 2) - (aRect.top + aRect.height / 2);
+        proj.style.transform = `translate(${dx}px, ${dy}px) scale(1.3)`;
+        setTimeout(() => proj.remove(), 190);
+      });
+    }
   }
 
   atkU.mana = Math.min(100, (atkU.mana || 0) + 25);
@@ -520,6 +547,13 @@ function resolveRangedAttack(state, attackerCoord, targetCoord, tick) {
   let dmg = Math.round(atkU.atk * 0.85 * (isUlt ? 1.4 : 1.0));
   if (atkU.equippedArtifact?.id === 'starshell') dmg += 16;
   applyDamageWithShield(tgtU, dmg);
+
+  // Target flinch on impact
+  if (tEl) {
+    tEl.classList.remove('unit-flinch');
+    void tEl.offsetWidth;
+    tEl.classList.add('unit-flinch');
+  }
 
   try { AudioEngine.hit(); } catch (err) {}
   showDamageText(targetCoord.r, targetCoord.c, dmg, false, isUlt ? '#38bdf8' : '#a78bfa');
@@ -544,8 +578,12 @@ export function resolveClash(state, p, e, tick) {
   const pEl = document.getElementById(`unit-${p.r}-${p.c}`);
   const eEl = document.getElementById(`unit-${e.r}-${e.c}`);
 
-  if (pEl) { pEl.classList.remove('lunge-up'); void pEl.offsetWidth; pEl.classList.add('lunge-up'); }
-  if (eEl) { eEl.classList.remove('lunge-down'); void eEl.offsetWidth; eEl.classList.add('lunge-down'); }
+  // Role-specific attack animation (Slash for Slashers, Heavy Slam for Vanguards, Lunge for others)
+  const pAnim = pU.role === 'Slasher' ? 'attack-slash-up' : (pU.role === 'Vanguard' ? 'attack-slam-up' : 'lunge-up');
+  const eAnim = eU.role === 'Slasher' ? 'attack-slash-down' : (eU.role === 'Vanguard' ? 'attack-slam-down' : 'lunge-down');
+
+  if (pEl) { pEl.classList.remove(pAnim, 'lunge-up'); void pEl.offsetWidth; pEl.classList.add(pAnim); }
+  if (eEl) { eEl.classList.remove(eAnim, 'lunge-down'); void eEl.offsetWidth; eEl.classList.add(eAnim); }
 
   pU.mana = Math.min(100, (pU.mana || 0) + 25);
   eU.mana = Math.min(100, (eU.mana || 0) + 25);
@@ -653,9 +691,26 @@ export function resolveClash(state, p, e, tick) {
     try { AudioEngine.crit(); } catch (err) {}
     triggerScreenShake(true);
     if (eCell) triggerRoleVfx(eCell, 'Slasher');
+    if (eEl) {
+      eEl.classList.remove('unit-crit-stagger');
+      void eEl.offsetWidth;
+      eEl.classList.add('unit-crit-stagger');
+    }
   } else {
     try { AudioEngine.hit(); } catch (err) {}
     triggerScreenShake(false);
+    if (eEl) {
+      eEl.classList.remove('unit-flinch');
+      void eEl.offsetWidth;
+      eEl.classList.add('unit-flinch');
+    }
+  }
+
+  // Player unit flinch from counter attack
+  if (pEl) {
+    pEl.classList.remove('unit-flinch');
+    void pEl.offsetWidth;
+    pEl.classList.add('unit-flinch');
   }
 
   if (pType === 'Mech' && eU.currentHp <= 0) {
