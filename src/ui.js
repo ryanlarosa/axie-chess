@@ -374,8 +374,24 @@ export function updateUI(state, checkSecretFusionFn, toggleTraitFn) {
     else cmdBadge.innerText = '👑 Cmd';
   }
 
-  const sellBtn = document.getElementById('sell-btn');
-  if (sellBtn) sellBtn.style.display = state.selectedSource ? 'block' : 'none';
+  const rerollBtn = document.getElementById('reroll-btn');
+  if (rerollBtn) {
+    if (state.freeRerollAvailable) {
+      rerollBtn.innerHTML = `🔄 <b>FREE</b>`;
+      rerollBtn.style.borderColor = 'var(--accent-gold)';
+      rerollBtn.style.color = 'var(--accent-gold)';
+    } else {
+      rerollBtn.innerHTML = `🔄 2g`;
+      rerollBtn.style.borderColor = 'var(--panel-border)';
+      rerollBtn.style.color = '#cbd5e1';
+    }
+  }
+
+  const interestHint = document.getElementById('interest-hint');
+  if (interestHint) {
+    interestHint.style.color = currentInterest > 0 ? 'var(--accent-gold)' : 'var(--text-muted)';
+    interestHint.style.fontWeight = currentInterest > 0 ? '900' : '700';
+  }
 
   updateStageRibbon(state.stage);
   updateSynergyBar(state, toggleTraitFn);

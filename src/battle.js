@@ -186,6 +186,11 @@ export async function startBattle(state, callbacks) {
       }
     }
 
+    const banner = document.getElementById('opponent-banner');
+    if (banner) {
+      banner.innerHTML = `⚔️ ROUND ${state.stage} CLASH: <b style="color:#22c55e;">${pAlive} ALLIES</b> VS <b style="color:#ef4444;">${eAlive} ENEMIES</b>`;
+    }
+
     if (eAlive === 0) {
       try { AudioEngine.win(); } catch (e) {}
       triggerScreenShake(true);
@@ -701,6 +706,7 @@ function restoreBoardAndEndRound(state, savedPlayerArmy, callbacks) {
     state.board[item.r][item.c] = item.unit;
   });
 
+  state.freeRerollAvailable = true;
   spawnEncounter(state);
   callbacks.generateShop();
   callbacks.renderAll();

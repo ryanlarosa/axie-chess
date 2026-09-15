@@ -45,7 +45,8 @@ export const state = {
   ],
   bench: [null, null, null, null, null],
   artifactInventory: [null, null],
-  shopItems: []
+  shopItems: [],
+  freeRerollAvailable: true
 };
 
 export function getMaxDeployCap() {
@@ -109,11 +110,16 @@ export function generateShop() {
 
 export function rerollShop() {
   if (state.isBattling) return;
-  if (state.gold < 2) {
-    showToast("⚠️ Need 2g to reroll!");
-    return;
+  if (state.freeRerollAvailable) {
+    state.freeRerollAvailable = false;
+    showToast("✨ <b>FREE REROLL USED!</b>");
+  } else {
+    if (state.gold < 2) {
+      showToast("⚠️ Need 2g to reroll!");
+      return;
+    }
+    state.gold -= 2;
   }
-  state.gold -= 2;
   try { AudioEngine.reroll(); } catch (e) {}
   generateShop();
   syncUI();
@@ -249,7 +255,7 @@ export function checkSecretFusion(u1, u2) {
 }
 
 export function openMutationDiscoveryShowcase(mutUnit) {
-  try { AudioEngine.evolve(); } catch (e) {}
+  try { AudioEngine.fanfare(); } catch (e) {}
   triggerScreenShake(true);
 
   const imgEl = document.getElementById('mut-showcase-img');
@@ -258,10 +264,11 @@ export function openMutationDiscoveryShowcase(mutUnit) {
   const abEl = document.getElementById('mut-showcase-ability');
 
   if (imgEl) imgEl.src = mutUnit.img;
-  if (nameEl) nameEl.innerText = `${mutUnit.name} (★★★)`;
+  if (nameEl) nameEl.innerText = `✨ ${mutUnit.name} (★★★) ✨`;
   if (specEl) specEl.innerText = `${mutUnit.species} • ${mutUnit.role}`;
   if (abEl) abEl.innerHTML = `<b>${mutUnit.ability}:</b> ${mutUnit.abilityDesc}<br><i style="color:#f59e0b;">${mutUnit.desc}</i>`;
 
+  showToast(`🧬 <b>SECRET MUTATION DISCOVERED!</b><br>${mutUnit.name} has awakened!`);
   openModal('mutation-discovery-modal');
 }
 

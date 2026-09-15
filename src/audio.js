@@ -1,4 +1,4 @@
-﻿export const AudioEngine = {
+export const AudioEngine = {
   ctx: null,
   init() {
     try {
@@ -53,6 +53,9 @@
   },
   lose() {
     [330, 293, 261, 196].forEach((f, i) => setTimeout(() => this.playTone(f, 'sawtooth', 0.2), i * 120));
+  },
+  fanfare() {
+    [261, 329, 392, 523, 659, 784, 1046].forEach((f, i) => setTimeout(() => this.playTone(f, 'triangle', 0.18, f * 1.2), i * 80));
   }
 };
 
