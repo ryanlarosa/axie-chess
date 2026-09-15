@@ -36,6 +36,8 @@ export function createUnitEl(unit, isSelected, highlightedTrait = null, customId
   const isGlowing = highlightedTrait && (uType === highlightedTrait || unit.role === highlightedTrait);
   const isManaReady = (unit.mana || 0) >= 100;
   div.className = `unit ${uType} ${isSelected ? 'unit-selected' : ''} ${isGlowing ? 'syn-glow' : ''} ${isManaReady ? 'mana-ready' : ''}`;
+  div.dataset.unitName = unit.name;
+  div.dataset.unitLevel = unit.level || 1;
   if (customId) div.id = customId;
 
   const starTxt = unit.level === 3 ? '★★★' : (unit.level === 2 ? '★★' : '★');
@@ -111,8 +113,12 @@ export function renderBoard(state, checkSecretFusionFn) {
         continue;
       }
 
-      // If unit already exists in DOM at this position, update bars in-place without killing animations
-      if (existingUnitEl && existingUnitEl.id === `unit-${r}-${c}`) {
+      // During active battle, preserve DOM element to keep animations running, updating bars/stats in-place
+      const isSameUnit = existingUnitEl && 
+                         existingUnitEl.dataset.unitName === unit.name && 
+                         Number(existingUnitEl.dataset.unitLevel) === unit.level;
+
+      if (state.isBattling && isSameUnit) {
         const hpPct = Math.max(0, Math.min(100, (unit.currentHp / unit.maxHp) * 100));
         const shieldPct = Math.min(100, ((unit.shield || 0) / unit.maxHp) * 100);
         const manaPct = Math.min(100, ((unit.mana || 0) / 100) * 100);

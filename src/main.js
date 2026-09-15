@@ -241,8 +241,11 @@ export function rollRngSecretMutation(speciesKey) {
 
 export function checkSecretFusion(u1, u2) {
   if (!u1 || !u2 || u1.level < 2 || u2.level < 2) return null;
-  const t1 = u1.type || u1.species;
-  const t2 = u2.type || u2.species;
+  const t1 = u1.species || u1.type;
+  const t2 = u2.species || u2.type;
+
+  const secretClasses = ['Mech', 'Dusk', 'Dawn', 'Boss'];
+  if (secretClasses.includes(t1) || secretClasses.includes(t2)) return null;
 
   const isGroup1 = (t) => ['Beast', 'Bug'].includes(t);
   const isGroup2 = (t) => ['Aqua', 'Bird'].includes(t);
@@ -353,6 +356,11 @@ export function moveOrMerge(destType, destCoord) {
   const secretEvolve = checkSecretFusion(sourceUnit, destUnit);
   if (secretEvolve) {
     const speciesCategory = secretEvolve.name.includes('Mech') ? 'Mech' : (secretEvolve.name.includes('Dusk') ? 'Dusk' : 'Dawn');
+    const secretImages = {
+      Dusk: 'https://axiecdn.axieinfinity.com/axies/10549074/axie/axie-full-transparent.png',
+      Dawn: 'https://axiecdn.axieinfinity.com/axies/10549079/axie/axie-full-transparent.png',
+      Mech: 'https://axiecdn.axieinfinity.com/axies/10549075/axie/axie-full-transparent.png'
+    };
     const evolvedUnit = {
       ...secretEvolve,
       species: speciesCategory,
@@ -365,7 +373,7 @@ export function moveOrMerge(destType, destCoord) {
       atk: secretEvolve.atk,
       level: 3,
       tier: 5,
-      img: 'https://axiecdn.axieinfinity.com/axies/10549077/axie/axie-full-transparent.png',
+      img: secretImages[speciesCategory] || 'https://axiecdn.axieinfinity.com/axies/10549077/axie/axie-full-transparent.png',
       equippedArtifact: sourceUnit.equippedArtifact || destUnit.equippedArtifact || null,
       partLabel: `${secretEvolve.part} ★★★`,
       team: 'player'
