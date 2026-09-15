@@ -1,4 +1,4 @@
-import { SVG_ICONS, PLAYER_LEVELS, SECRET_MUTATION_TABLE } from './config.js';
+import { SVG_ICONS, PLAYER_LEVELS, SECRET_MUTATION_TABLE, SYNERGY_INFO } from './config.js';
 import { AudioEngine } from './audio.js';
 
 let toastTimer = null;
@@ -239,15 +239,80 @@ export function updateSynergyBar(state, toggleTraitFn) {
       const active = s.count >= s.req;
       const tag = document.createElement('div');
       tag.className = `syn-tag ${active ? 'active' : ''}`;
+      const synInfo = SYNERGY_INFO[s.name];
+      const bonusBrief = synInfo ? synInfo.bonus.split('.')[0] : '';
+      tag.title = `${s.name}: ${bonusBrief}`;
       tag.innerHTML = `
         <span class="svg-badge" style="width:10px; height:10px;">${SVG_ICONS[s.iconKey] || ''}</span>
         <span>${s.name} (${s.count}/${s.req})</span>
       `;
-      tag.onclick = (e) => { e.stopPropagation(); toggleTraitFn(s.name); };
+      tag.onclick = (e) => {
+        e.stopPropagation();
+        toggleTraitFn(s.name);
+        openSynergyGuideModal(state, s.name);
+      };
       bar.appendChild(tag);
     }
   });
-  if (bar.innerHTML === '') bar.innerHTML = '<span style="color:#64748b; font-size:7.5px;">Deploy unique species to activate traits</span>';
+
+  if (bar.innerHTML === '') {
+    bar.innerHTML = '<span style="color:#64748b; font-size:7.5px; cursor:pointer;" id="empty-syn-hint">⚡ Tap to view all Team Synergies & Buffs</span>';
+    const hint = bar.querySelector('#empty-syn-hint');
+    if (hint) hint.onclick = (e) => { e.stopPropagation(); openSynergyGuideModal(state); };
+  }
+}
+
+export function openSynergyGuideModal(state, focusTrait = null) {
+  try { AudioEngine.tap(); } catch (e) {}
+  renderSynergyGuideList(state, focusTrait);
+  openModal('synergy-guide-modal');
+  if (focusTrait) {
+    setTimeout(() => {
+      const targetCard = document.getElementById(`syn-card-${focusTrait}`);
+      if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
+  }
+}
+
+export function renderSynergyGuideList(state, focusTrait = null) {
+  const container = document.getElementById('synergy-guide-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const { roleCounts, originCounts } = getUniqueSynergyCounts(state.board, 'player');
+
+  Object.keys(SYNERGY_INFO).forEach(traitKey => {
+    const info = SYNERGY_INFO[traitKey];
+    const currentCount = (info.category === 'Role') ? (roleCounts[traitKey] || 0) : (originCounts[traitKey] || 0);
+    const isActive = currentCount >= info.req;
+    const isFocused = focusTrait === traitKey;
+
+    const card = document.createElement('div');
+    card.id = `syn-card-${traitKey}`;
+    card.className = `synergy-guide-card ${isActive ? 'active-team' : ''} ${isFocused ? 'highlighted' : ''}`;
+
+    card.innerHTML = `
+      <div class="synergy-card-top">
+        <div class="synergy-card-title">
+          <span class="svg-badge" style="width:14px; height:14px;">${SVG_ICONS[traitKey] || '⚡'}</span>
+          <span>${traitKey}</span>
+          <span class="synergy-badge-chip">${info.badge}</span>
+        </div>
+        <div class="synergy-count-status">
+          ${currentCount > 0 ? (isActive ? `<b style="color:var(--accent-gold);">ACTIVE (${currentCount}/${info.req})</b>` : `<span style="color:#94a3b8;">DEPLOYED: ${currentCount}/${info.req}</span>`) : `<span style="color:#64748b;">(Req: ${info.req})</span>`}
+        </div>
+      </div>
+      <div class="synergy-bonus-text">✨ ${info.bonus}</div>
+      <div class="synergy-detail-text">${info.details}</div>
+    `;
+
+    card.onclick = (e) => {
+      e.stopPropagation();
+      showToast(`Trait Filter: Highlighting <b>${traitKey}</b> units`);
+    };
+
+    container.appendChild(card);
+  });
 }
 
 export function updateLobbyDrawer(tournamentPlayers) {
@@ -276,17 +341,23 @@ export function updateOnboardingTip(state) {
   if (!msgEl) return;
   const deployed = getDeployedCount(state.board);
   const cap = Math.min(6, state.playerLevel + 1);
+  const benchUnits = state.bench.filter(Boolean);
 
-  if (state.stage === 1 && deployed === 0 && state.bench.every(s => s === null)) {
-    msgEl.innerText = "Draft an Axie from the shop (2g) to build your squad.";
-  } else if (deployed === 0 && state.bench.some(Boolean)) {
-    msgEl.innerText = "Tap an Axie on your bench, then tap your zone to deploy.";
-  } else if (deployed > 0 && deployed < cap && state.bench.some(Boolean)) {
-    msgEl.innerText = `Deploy another Axie! Capacity: ${deployed}/${cap}.`;
-  } else if (state.stage >= 2 && Object.values(state.discoveredFusions).every(v => !v)) {
-    msgEl.innerText = "Tip: 3 identical Axies auto-merge into ★★. Two ★★ opposites breed Secret Classes!";
+  if (state.stage === 1 && deployed === 0 && benchUnits.length === 0) {
+    msgEl.innerHTML = "<b>Step 1:</b> Tap an Axie in the shop (2g) to draft them to your bench.";
+  } else if (deployed === 0 && benchUnits.length > 0) {
+    msgEl.innerHTML = "<b>Step 2:</b> Tap an Axie on your bench, then tap your arena zone (bottom 2 rows) to deploy!";
+  } else if (deployed > 0 && deployed < cap && benchUnits.length > 0) {
+    msgEl.innerHTML = `<b>Deploy Reinforcement:</b> Squad capacity is <b>${deployed}/${cap}</b>. Tap bench Axie to deploy!`;
+  } else if (state.stage === 1 && deployed >= 1) {
+    msgEl.innerHTML = "<b>Ready!</b> Tap <b>CLASH</b> to start Round 1. Vanguards absorb blows, Marksmen snipe from back.";
+  } else if (state.stage === 2 && Object.values(state.discoveredFusions).every(v => !v)) {
+    msgEl.innerHTML = "<b>Merging:</b> 3 identical units auto-fuse to ★★. Drag two ★★ opposites to breed Secret Classes!";
+  } else if (state.gold >= 20 && Math.floor(state.gold / 10) >= 2) {
+    const intGold = Math.min(3, Math.floor(state.gold / 10));
+    msgEl.innerHTML = `<b>Interest Active:</b> You will earn <b>+${intGold}g bonus interest</b> at the end of this round!`;
   } else {
-    msgEl.innerText = "Tap CLASH when your lineup is ready for battle.";
+    msgEl.innerHTML = "Tap <b>CLASH</b> when your formation and synergies are ready for battle.";
   }
 }
 

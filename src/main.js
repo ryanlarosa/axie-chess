@@ -10,6 +10,7 @@ import {
   renderArtifactStash,
   openInspectModal,
   renderDiscoveryLog,
+  openSynergyGuideModal,
   updateUI,
   getDeployedCount
 } from './ui.js';
@@ -546,6 +547,8 @@ export function setupDelegatedEvents() {
     closeModal('mutation-discovery-modal');
   });
 
+  bind('open-synergy-btn', () => { try { AudioEngine.tap(); } catch(e){} openSynergyGuideModal(state); });
+  bind('close-synergy-guide-btn', () => { try { AudioEngine.tap(); } catch(e){} closeModal('synergy-guide-modal'); });
   bind('open-guide-btn', () => { try { AudioEngine.tap(); } catch(e){} openModal('guide-modal'); });
   bind('close-guide-btn', () => { try { AudioEngine.tap(); } catch(e){} closeModal('guide-modal'); });
   bind('open-log-btn', () => {

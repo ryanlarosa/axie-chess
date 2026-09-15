@@ -15,6 +15,93 @@ export const SVG_ICONS = {
   Titan: `<svg viewBox="0 0 24 24" style="color:#ef4444"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>`
 };
 
+export const SYNERGY_INFO = {
+  Vanguard: {
+    category: 'Role',
+    req: 2,
+    badge: '🛡️ TANK',
+    bonus: '+50 Grey Shield to all Vanguard units at combat start. Vanguards also take 20% reduced incoming clash damage.',
+    details: 'Vanguards hold the frontline, absorbing critical blows so your squishy backline carries can build mana.'
+  },
+  Slasher: {
+    category: 'Role',
+    req: 2,
+    badge: '⚔️ BURST',
+    bonus: '+35% Critical Strike Chance on all attacks. Deals 1.75x (or 2.5x Mech) devastating crit damage.',
+    details: 'Slashers execute fast offensive strikes, cutting down enemy frontliners in early ticks.'
+  },
+  Marksman: {
+    category: 'Role',
+    req: 2,
+    badge: '🏹 RANGED',
+    bonus: '+18 Attack Damage to all Marksman units. Carries fire piercing ranged energy shots from the backline.',
+    details: 'Backline snipers who unleash continuous ranged support damage without taking frontline damage.'
+  },
+  Plant: {
+    category: 'Species',
+    req: 2,
+    badge: '🌿 BASTION',
+    bonus: '+40 Grey Shield to all Plant allies at round start.',
+    details: 'Roots of Lunacia provide robust shielding, making them the ultimate defensive cornerstone.'
+  },
+  Beast: {
+    category: 'Species',
+    req: 2,
+    badge: '🐾 FEROCITY',
+    bonus: '+30% bonus Crit Rate for all Beast allies.',
+    details: 'Wild instincts ignite catastrophic critical strikes that can shatter shields.'
+  },
+  Aqua: {
+    category: 'Species',
+    req: 2,
+    badge: '💧 REGEN',
+    bonus: '+15 HP regenerated each tick of battle for all Aqua units.',
+    details: 'Living tidal surge sustains your team throughout prolonged slugfests.'
+  },
+  Bird: {
+    category: 'Species',
+    req: 2,
+    badge: '🪶 TEMPO',
+    bonus: 'Double Strike on Turn 1! Bird units attack twice in rapid succession.',
+    details: 'Aerial blitz gives Birds an immediate tempo advantage at the opening clash.'
+  },
+  Bug: {
+    category: 'Species',
+    req: 2,
+    badge: '🪲 EXOSKELETON',
+    bonus: '30% incoming damage reduction for all Bug allies.',
+    details: 'Hard chitin shells deflect heavy punishment from enemy Slashers and Bosses.'
+  },
+  Reptile: {
+    category: 'Species',
+    req: 2,
+    badge: '🦎 THORNS',
+    bonus: 'Reflects 25% of all received clash damage directly back to the attacker.',
+    details: 'Punishes high-damage attackers by turning their own power against them.'
+  },
+  Mech: {
+    category: 'Secret Class',
+    req: 1,
+    badge: '⚙️ APEX CRIT',
+    bonus: '100% Critical Strike Chance on all attacks & amplified 2.5x Critical Burst multiplier.',
+    details: 'Genetic chimera combining Beast/Bug + Aqua/Bird. Melts targets with cybernetic lasers.'
+  },
+  Dusk: {
+    category: 'Secret Class',
+    req: 1,
+    badge: '🌑 SHADOW IMMUNITY',
+    bonus: 'Complete immunity to all enemy Critical Strikes & bypasses enemy shields.',
+    details: 'Genetic chimera combining Plant/Reptile + Aqua/Bird. Shuts down critical strike builds.'
+  },
+  Dawn: {
+    category: 'Secret Class',
+    req: 1,
+    badge: '☀️ SOLAR BLIND',
+    bonus: 'Blinds the entire opposing frontline on round start, causing their first attack to MISS.',
+    details: 'Genetic chimera combining Plant/Reptile + Beast/Bug. Neutralizes enemy burst openers.'
+  }
+};
+
 export const PLAYER_LEVELS = [
   { level: 1, reqAXP: 100, maxTier: 1 },
   { level: 2, reqAXP: 160, maxTier: 1 },

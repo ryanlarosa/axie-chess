@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Axie Lunacia Fall - Tactical Discovery Auto-Battler</title>
-<link rel="stylesheet" href="css/style.css?v=2.2">
+<link rel="stylesheet" href="css/style.css?v=2.3">
 </head>
 <body>
 
@@ -72,6 +72,7 @@
         <span style="color:#94a3b8;"><span id="current-axp">0</span>/<span id="next-axp">100</span> AXP</span>
         <span class="hud-chip" id="tier-badge" style="color:var(--accent-blue); padding:1px 4px; font-size:8px;">T1</span>
       </div>
+      <button class="btn-hud" id="open-synergy-btn" style="color:var(--accent-gold); border-color:rgba(245,158,11,0.3);">⚡ SYNERGIES</button>
       <button class="btn-hud" id="open-guide-btn">📘 GUIDE</button>
       <button class="btn-hud" id="open-log-btn">📖 LOG</button>
       <button class="btn-hud" id="open-lobby-btn">🏆 (8/8)</button>
@@ -244,6 +245,22 @@
     </div>
   </div>
 
+  <!-- 12B. SYNERGY COMPENDIUM & BENEFIT GUIDE MODAL -->
+  <div class="modal-overlay" id="synergy-guide-modal">
+    <div class="modal-sheet synergy-sheet">
+      <div class="modal-header">
+        <span style="font-weight:900; color:var(--accent-gold); font-size:12.5px; display:flex; align-items:center; gap:5px;">
+          <span>⚡</span> LUNACIAN SYNERGY COMPENDIUM
+        </span>
+        <button class="modal-close-btn" id="close-synergy-guide-btn">✕</button>
+      </div>
+      <div style="font-size:9.5px; color:#94a3b8; margin-top:-2px;">
+        Tap any synergy below or in the top bar to inspect team buffs and unlock conditions.
+      </div>
+      <div class="synergy-guide-grid" id="synergy-guide-list"></div>
+    </div>
+  </div>
+
   <!-- 13. VICTORY MODAL -->
   <div class="modal-overlay" id="victory-modal">
     <div style="background: radial-gradient(circle at 50% 30%, #1e1b4b 0%, #030712 100%); width: 88%; max-width: 360px; border-radius: 12px; border: 2px solid var(--accent-gold); padding: 20px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin: auto; pointer-events: auto;">
@@ -279,6 +296,6 @@
   </div>
 </div>
 
-<script type="module" src="src/main.js?v=2.2"></script>
+<script type="module" src="src/main.js?v=2.3"></script>
 </body>
 </html>
