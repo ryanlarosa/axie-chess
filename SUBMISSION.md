@@ -81,25 +81,40 @@
 
 ---
 
-### 6. Repository Link
+### 6. Repository Link & Review Commit
 - **Repository URL:**  
   👉 **[https://github.com/ryanlarosa/axie-chess.git](https://github.com/ryanlarosa/axie-chess.git)**  
-  *(Public or private repository compatible)*
+- **Review Commit SHA (Exact 40-character):**  
+  `3b6f7cf9c9885b70d83ad754c6453798c96b6376`  
+- **GitHub Reviewer Access:**  
+  The GitHub account `jaatster` must have access (or repository is public). *(Confirmed: Repository is reviewable on GitHub)*.
 
 ---
 
-### 7. Fallback Demo Video
+### 7. Demonstration Video (Now Optional per Rules v1.0.2)
+- **Status:** **Optional** (Per Official Rules v1.0.2, a video is no longer strictly mandatory, but recommended if available).
 - **Video Recording Checklist (1–2 minutes):**
   1. Opening screen: Title screen with commander selection (*Captain Oak / Ronin Shihan / Chimera Alchemist*).
   2. Early round: Drafting Axies from the shop, positioning frontline and backline on the 3x4 grid.
   3. Combat phase: Automatic clashes with procedural sound effects, mana accumulation bars, floating ability pills (`⚡ Shield Wall!`), and floating critical damage numbers.
   4. Merge & Mutation showcase: Merging 3 copies into ★★, dragging two opposites to breed a secret class, opening the Discovery Log.
   5. Boss Wave: Round 5 Boss encounter against the Grave Goliath and selecting a Runic Boss Artifact.
-- **Link Placeholder:** `[Insert your YouTube / Loom / Google Drive Demo Video Link Here]`
+- **Link Placeholder:** `[Optional: YouTube / Loom / Google Drive Demo Video Link]`
 
 ---
 
-### 8. AI Tools Used & How the Game Fits "Axie Core"
+### 8. Finalization Checklist & Disclosures (Rules v1.0.2 Compliance)
+- **Supported Platform:** Browser (Mobile Web & Desktop Chrome / Safari / Firefox)
+- **External Play Link:** [https://axie-chess.vercel.app](https://axie-chess.vercel.app)
+- **Verified Discord Connection:** Ensure your Discord is connected to your Vibeathon profile before hitting "Finalize Revision".
+- **Known Issues:** None blocking. Game uses procedural Web Audio which unlocks upon first user tap/interaction.
+- **Starters / Dependencies:** Zero external framework dependencies. Pure Vanilla ES6 modules and semantic CSS.
+- **Material AI Disclosure:** Google Antigravity / Gemini 2.0 Pro used for system design, procedural sound synthesis, UI responsiveness, and code refactoring.
+- **Asset Attribution:** Official Axie Infinity CDN graphics via Sky Mavis asset permission.
+
+---
+
+### 9. AI Tools Used & How the Game Fits "Axie Core"
 
 #### AI Tools Disclosure:
 - **Google Antigravity / Gemini 2.0 Pro:** Used for architectural design, procedural Web Audio synthesizer programming, responsive mobile 100dvh CSS styling, balance curve simulation, and zero-build vanilla ES modules refactoring.
@@ -112,6 +127,6 @@
 2. **Breeding & Genetics Philosophy:**
    - Transposes the core Axie breeding mechanic into an active, tactile auto-battler discovery loop. Merging duplicate genes yields star ascensions, while cross-breeding opposing classes discovers mutations.
 3. **Web3 & Ronin-Ready Mobile Ergonomics:**
-   - Zero-build architecture makes it seamlessly embeddable in mobile dApp browsers, Ronin Waypoint, or Telegram/Farcaster mini-apps without heavy framework bundles or download gates.
+   - Zero-build architecture makes it seamlessly embeddable in mobile dApp browsers, Ronin Waypoint, or Telegram/Farcaster mini-apps without heavy framework bundles or download gates. Basic play requires no wallet or account gates.
 4. **Player Progression & AXP:**
    - Incorporates Axie Experience Points (AXP) as the player leveling mechanic, driving army cap increases and high-tier Axie access.
