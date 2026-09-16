@@ -85,7 +85,7 @@
 - **Repository URL:**  
   👉 **[https://github.com/ryanlarosa/axie-chess.git](https://github.com/ryanlarosa/axie-chess.git)**  
 - **Review Commit SHA (Exact 40-character):**  
-  `3b6f7cf9c9885b70d83ad754c6453798c96b6376`  
+  `20ad3f280602b400084ba0fbef9f8a703f6963df`  
 - **GitHub Reviewer Access:**  
   The GitHub account `jaatster` must have access (or repository is public). *(Confirmed: Repository is reviewable on GitHub)*.
 
