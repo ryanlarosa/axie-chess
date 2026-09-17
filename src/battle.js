@@ -596,24 +596,28 @@ export function resolveClash(state, p, e, tick) {
   if (pCell && eCell && pEl && eEl) {
     const pRect = pCell.getBoundingClientRect();
     const eRect = eCell.getBoundingClientRect();
-    const dx = (eRect.left - pRect.left) * 0.48;
-    const dy = (eRect.top - pRect.top) * 0.48;
+    const dx = (eRect.left - pRect.left) * 0.72;
+    const dy = (eRect.top - pRect.top) * 0.72;
 
+    pEl.style.zIndex = '50';
+    eEl.style.zIndex = '45';
     pEl.style.transition = 'transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28), filter 0.22s ease';
     eEl.style.transition = 'transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28), filter 0.22s ease';
 
     // Leap toward target with scale and tilt
-    pEl.style.transform = `translate(${dx}px, ${dy}px) scale(1.18) rotate(${dx > 0 ? 8 : -8}deg)`;
-    eEl.style.transform = `translate(${-dx * 0.7}px, ${-dy * 0.7}px) scale(1.15) rotate(${dx > 0 ? -6 : 6}deg)`;
+    pEl.style.transform = `translate(${dx}px, ${dy}px) scale(1.22) rotate(${dx > 0 ? 10 : -10}deg)`;
+    eEl.style.transform = `translate(${-dx * 0.5}px, ${-dy * 0.5}px) scale(1.15) rotate(${dx > 0 ? -6 : 6}deg)`;
 
     setTimeout(() => {
       if (pEl) {
         pEl.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
         pEl.style.transform = 'translate(0, 0) scale(1) rotate(0deg)';
+        pEl.style.zIndex = '';
       }
       if (eEl) {
         eEl.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
         eEl.style.transform = 'translate(0, 0) scale(1) rotate(0deg)';
+        eEl.style.zIndex = '';
       }
     }, 220);
   }
