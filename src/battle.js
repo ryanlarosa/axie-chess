@@ -376,7 +376,21 @@ export function executeTick(state, tick) {
     }
   }
 
-  // 1. Frontline column clashes (Melee / Primary clash)
+  // 1. Auto Chess Grid Advancement (Backline steps forward into empty frontline slots)
+  for (let c = 0; c < 3; c++) {
+    // Player backline (Row 3) advances to frontline (Row 2) if front is empty
+    if (!state.board[2][c] && state.board[3][c] && state.board[3][c].team === 'player') {
+      state.board[2][c] = state.board[3][c];
+      state.board[3][c] = null;
+    }
+    // Enemy backline (Row 0) advances to frontline (Row 1) if front is empty
+    if (!state.board[1][c] && state.board[0][c] && state.board[0][c].team === 'enemy') {
+      state.board[1][c] = state.board[0][c];
+      state.board[0][c] = null;
+    }
+  }
+
+  // 2. Frontline column clashes (Melee / Primary clash)
   for (let col = 0; col < 3; col++) {
     let p = null, e = null;
     for (let r = 2; r <= 3; r++) if (state.board[r][col]?.team === 'player') { p = { r, c: col }; break; }
@@ -578,12 +592,31 @@ export function resolveClash(state, p, e, tick) {
   const pEl = document.getElementById(`unit-${p.r}-${p.c}`);
   const eEl = document.getElementById(`unit-${e.r}-${e.c}`);
 
-  // Role-specific attack animation (Slash for Slashers, Heavy Slam for Vanguards, Lunge for others)
-  const pAnim = pU.role === 'Slasher' ? 'attack-slash-up' : (pU.role === 'Vanguard' ? 'attack-slam-up' : 'lunge-up');
-  const eAnim = eU.role === 'Slasher' ? 'attack-slash-down' : (eU.role === 'Vanguard' ? 'attack-slam-down' : 'lunge-down');
+  // Role-specific attack animation & physical auto-chess dash movement
+  if (pCell && eCell && pEl && eEl) {
+    const pRect = pCell.getBoundingClientRect();
+    const eRect = eCell.getBoundingClientRect();
+    const dx = (eRect.left - pRect.left) * 0.48;
+    const dy = (eRect.top - pRect.top) * 0.48;
 
-  if (pEl) { pEl.classList.remove(pAnim, 'lunge-up'); void pEl.offsetWidth; pEl.classList.add(pAnim); }
-  if (eEl) { eEl.classList.remove(eAnim, 'lunge-down'); void eEl.offsetWidth; eEl.classList.add(eAnim); }
+    pEl.style.transition = 'transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28), filter 0.22s ease';
+    eEl.style.transition = 'transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28), filter 0.22s ease';
+
+    // Leap toward target with scale and tilt
+    pEl.style.transform = `translate(${dx}px, ${dy}px) scale(1.18) rotate(${dx > 0 ? 8 : -8}deg)`;
+    eEl.style.transform = `translate(${-dx * 0.7}px, ${-dy * 0.7}px) scale(1.15) rotate(${dx > 0 ? -6 : 6}deg)`;
+
+    setTimeout(() => {
+      if (pEl) {
+        pEl.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        pEl.style.transform = 'translate(0, 0) scale(1) rotate(0deg)';
+      }
+      if (eEl) {
+        eEl.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        eEl.style.transform = 'translate(0, 0) scale(1) rotate(0deg)';
+      }
+    }, 220);
+  }
 
   pU.mana = Math.min(100, (pU.mana || 0) + 25);
   eU.mana = Math.min(100, (eU.mana || 0) + 25);
