@@ -160,7 +160,7 @@ export function renderShop(state) {
     const canAfford = state.gold >= (item.cost || 2);
     const tierColor = `var(--tier-${item.tier || 1})`;
     const card = document.createElement('div');
-    card.className = 'shop-card';
+    card.className = `shop-card ${item.species}`;
     card.dataset.shopIdx = idx;
     card.innerHTML = `
       <div class="shop-card-header">
