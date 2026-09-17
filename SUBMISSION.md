@@ -109,7 +109,7 @@
 - **Supported Platform:** Browser (Mobile Web & Desktop Chrome / Safari / Firefox)
 - **External Play Link:** [https://axie-chess.vercel.app](https://axie-chess.vercel.app)
 - **GitHub Repository:** [https://github.com/ryanlarosa/axie-chess](https://github.com/ryanlarosa/axie-chess)
-- **Latest Commit SHA:** `da9b32a`
+- **Latest Commit SHA:** `3a7b2fc`
 - **Verified Discord Connection:** Ensure your Discord is connected to your Vibeathon profile before hitting "Finalize Revision".
 - **Known Issues:** None blocking. Game uses procedural Web Audio which unlocks upon first user tap/interaction.
 - **Starters / Dependencies:** Zero external framework dependencies. Pure Vanilla ES6 modules and semantic CSS.
