@@ -733,18 +733,28 @@ export function showDamageText(r, c, dmg, isCrit, customColor = null) {
 
   const cellRect = cell.getBoundingClientRect();
   const wrapperRect = arenaWrapper.getBoundingClientRect();
+  const posX = cellRect.left - wrapperRect.left + cellRect.width / 2;
+  const posY = cellRect.top - wrapperRect.top + cellRect.height / 2;
 
+  // 1. Impact Spark Flash
+  const spark = document.createElement('div');
+  spark.className = `impact-spark ${isCrit ? 'spark-crit' : 'spark-normal'}`;
+  spark.style.left = `${posX}px`;
+  spark.style.top = `${posY}px`;
+  arenaWrapper.appendChild(spark);
+  setTimeout(() => spark.remove(), 320);
+
+  // 2. Floating Damage Number
   const txt = document.createElement('div');
-  txt.className = 'floating-num';
+  txt.className = `floating-num ${isCrit ? 'crit-num' : ''}`;
   txt.style.position = 'absolute';
-  txt.style.left = `${cellRect.left - wrapperRect.left + cellRect.width / 2}px`;
-  txt.style.top = `${cellRect.top - wrapperRect.top + cellRect.height / 2}px`;
-  txt.style.transform = 'translate(-50%, -50%)';
+  txt.style.left = `${posX}px`;
+  txt.style.top = `${posY}px`;
   txt.style.color = customColor || (isCrit ? '#facc15' : '#f87171');
   txt.innerText = isCrit ? `💥 ${dmg}` : `-${dmg}`;
 
   arenaWrapper.appendChild(txt);
-  setTimeout(() => txt.remove(), 700);
+  setTimeout(() => txt.remove(), isCrit ? 850 : 750);
 }
 
 function restoreBoardAndEndRound(state, savedPlayerArmy, callbacks) {
