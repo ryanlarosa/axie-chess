@@ -43,10 +43,12 @@
   Subheading: Tactical Discovery Auto-Battler • Axie Vibeathon 2026
   ```
 - **Live In-Game Asset URL:**
-  - `https://axiecdn.axieinfinity.com/axies/10549077/axie/axie-full-transparent.png` (Ronin Nut / Beast Slasher)
-  - `https://axiecdn.axieinfinity.com/axies/10549079/axie/axie-full-transparent.png` (Pumpkin Oak / Plant Vanguard)
-  - `https://axiecdn.axieinfinity.com/axies/10549078/axie/axie-full-transparent.png` (Nimo Fin / Aqua Marksman)
-  - `https://axiecdn.axieinfinity.com/axies/10549076/axie/axie-full-transparent.png` (Kestrel Wing / Bird Marksman)
+  - `https://axiecdn.axieinfinity.com/axies/10549077/axie/axie-full-transparent.png` (Pumpkin Oak / Plant Vanguard - Green Flora)
+  - `https://axiecdn.axieinfinity.com/axies/10549074/axie/axie-full-transparent.png` (Ronin Nut / Beast Slasher - Orange/Furry)
+  - `https://axiecdn.axieinfinity.com/axies/10549079/axie/axie-full-transparent.png` (Tri Spikes / Reptile Vanguard - Purple Horned)
+  - `https://axiecdn.axieinfinity.com/axies/10549078/axie/axie-full-transparent.png` (Nimo Fin / Aqua Marksman - Cyan Aquatic)
+  - `https://axiecdn.axieinfinity.com/axies/10549076/axie/axie-full-transparent.png` (Kestrel Wing / Bird Marksman - Pink Feathered)
+  - `https://axiecdn.axieinfinity.com/axies/10549075/axie/axie-full-transparent.png` (Pocky Pup / Bug Slasher - Amber Exoskeleton)
   - `https://axiecdn.axieinfinity.com/axies/10549074/axie/axie-full-transparent.png` (Lunacian Titan Boss)
 
 *(Tip: Take a screenshot or screen recording of the title screen or a boss combat round on mobile for a submission thumbnail image).*

@@ -358,8 +358,8 @@ export function moveOrMerge(destType, destCoord) {
   if (secretEvolve) {
     const speciesCategory = secretEvolve.name.includes('Mech') ? 'Mech' : (secretEvolve.name.includes('Dusk') ? 'Dusk' : 'Dawn');
     const secretImages = {
-      Dusk: 'https://axiecdn.axieinfinity.com/axies/10549074/axie/axie-full-transparent.png',
-      Dawn: 'https://axiecdn.axieinfinity.com/axies/10549079/axie/axie-full-transparent.png',
+      Dusk: 'https://axiecdn.axieinfinity.com/axies/10549079/axie/axie-full-transparent.png',
+      Dawn: 'https://axiecdn.axieinfinity.com/axies/10549077/axie/axie-full-transparent.png',
       Mech: 'https://axiecdn.axieinfinity.com/axies/10549075/axie/axie-full-transparent.png'
     };
     const evolvedUnit = {
